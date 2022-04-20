@@ -53,7 +53,7 @@ const MainPage = lazier(() => import('./MainPage'), 'Main');
  * This component sets up all the providers, Suspense and Error handling
  * @returns
  */
-const App: FC = () => {
+export const App: FC = () => {
   console.log('loading app...');
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -73,5 +73,3 @@ const App: FC = () => {
     </ErrorBoundary>
   );
 };
-
-export default App;

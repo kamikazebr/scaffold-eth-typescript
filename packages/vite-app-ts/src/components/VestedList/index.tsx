@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Skeleton, Empty } from 'antd';
 import { Button, TokenBadge } from '@1hive/1hive-ui';
 import { dateFormat } from '../../helpers/date-utils';
-import useVestedTokens from '../../hooks/useVestedTokens';
+import { useVestedTokens } from '../../hooks';
 import { Wrapper } from './index.styled';
 
 // import { vestedERC20S as mockData } from "../../mocks/vestedERC20S";
