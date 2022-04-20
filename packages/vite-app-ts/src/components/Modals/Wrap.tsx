@@ -21,8 +21,8 @@ export const Wrap = ({ vestedId, closeModal }: { vestedId: string; closeModal: a
 
   const handleWrap = useCallback(async () => {
     const amount = BigNumber.from(toDecimals(state.underlyingAmount, 18));
-    console.log('vestedId', vestedId);
-    await testERC20?.attach(vestedId).approve(vestedId, amount);
+    const r = await testERC20?.approve(vestedId, amount); // TODO use .attach too to point the other differtent underlying token than default one
+    await r?.wait();
     await vestedERC20?.attach(vestedId).wrap(amount, state.address);
   }, [state.address, state.underlyingAmount, testERC20, vestedERC20, vestedId]);
 

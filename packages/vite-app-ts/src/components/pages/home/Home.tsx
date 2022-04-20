@@ -20,6 +20,7 @@ function Home() {
   const [wrapContract, setWrapContract] = useState<string | null>(null);
 
   const ethersContext = useEthersContext();
+
   const handleShowModal = (mode: MODAL_MODES) => {
     setOpened(true);
     setModalMode(mode);
