@@ -21,6 +21,7 @@
     "outDir": "dist",
     "paths": {
       "~~/*": ["./src/*"],
+      "@vite/*": ["../packages/vite-app-ts/src/*"],
       "scripts/*": ["./scripts/*"],
       "helpers/*": ["./helpers/*"],
       "contracts/*": ["./contracts/*"],
