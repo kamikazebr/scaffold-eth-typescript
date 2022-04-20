@@ -8,7 +8,7 @@ import { useUserVestings } from '../../hooks';
 // import { vestings as mockData } from "../../mocks/vestings";
 import ListItems from '../List';
 
-export const UserVestingList = memo(({ address, onRedeemVesting }: any) => {
+export const UserVestingList = memo(({ address, onRedeemVesting }: { address: string; onRedeemVesting: any }) => {
   const { loading, error, data } = useUserVestings(address);
 
   if (!address) {

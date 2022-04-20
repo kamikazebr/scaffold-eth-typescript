@@ -3,18 +3,19 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import '~~/styles/main-page.css';
 
-import { useContractReader, useBalance, useEthersAdaptorFromProviderOrSigners } from 'eth-hooks';
+import { useContractReader, useBalance } from 'eth-hooks';
 import { useEthersContext } from 'eth-hooks/context';
 import { useDexEthPrice } from 'eth-hooks/dapps';
 import { asEthersAdaptor } from 'eth-hooks/functions';
 
-import { MainPageMenu, MainPageContracts, MainPageFooter, MainPageHeader } from './components/main';
+import { MainPageMenu, MainPageFooter, MainPageHeader } from './components/main';
 
 import { useBurnerFallback } from '~~/components/main/hooks/useBurnerFallback';
 import { useScaffoldProviders as useScaffoldAppProviders } from '~~/components/main/hooks/useScaffoldAppProviders';
-import { BURNER_FALLBACK_ENABLED, MAINNET_PROVIDER } from '~~/config/appConfig';
+import { BURNER_FALLBACK_ENABLED } from '~~/config/appConfig';
 import { useAppContracts, useConnectAppContracts, useLoadAppContracts } from '~~/config/contractContext';
 import { Subgraph } from './components/pages';
+import Home from './components/pages/home/Home';
 
 /**
  * ⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️
@@ -50,8 +51,8 @@ export const Main: FC = () => {
   // 🛻 load contracts
   useLoadAppContracts();
   // 🏭 connect to contracts for mainnet network & signer
-  const [mainnetAdaptor] = useEthersAdaptorFromProviderOrSigners(MAINNET_PROVIDER);
-  useConnectAppContracts(mainnetAdaptor);
+  // const [mainnetAdaptor] = useEthersAdaptorFromProviderOrSigners(MAINNET_PROVIDER);
+  // useConnectAppContracts(mainnetAdaptor);
   // 🏭 connec to  contracts for current network & signer
   useConnectAppContracts(asEthersAdaptor(ethersContext));
 
@@ -107,7 +108,7 @@ export const Main: FC = () => {
         <MainPageMenu route={route} setRoute={setRoute} />
         <Switch>
           <Route exact path="/">
-            <MainPageContracts scaffoldAppProviders={scaffoldAppProviders} />
+            <Home />
           </Route>
           {/* you can add routes here like the below examlples */}
           {/* <Route path="/exampleui"> */}

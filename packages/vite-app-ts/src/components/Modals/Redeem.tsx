@@ -1,47 +1,48 @@
 import { useCallback, useEffect, useState } from 'react';
 import { IconCross, Button, Field } from '@1hive/1hive-ui';
 import { ModalHeader, Row } from './index.styled';
-import { useContractLoader } from 'eth-hooks';
 import { ethers } from 'ethers';
 import { useIsMounted } from '../../hooks';
+import { useEthersContext } from 'eth-hooks/context';
+import { useAppContracts } from '~~/config/contractContext';
 
-export const Redeem = ({ contractLoader, vestedId, tx, closeModal, address }: any) => {
+export const Redeem = ({ vestedId, closeModal, address }: { vestedId: string; closeModal: any; address: string }) => {
   // Needs to be tested
   const isMounted = useIsMounted();
   const [redeemableAmount, setRedeemableAmount] = useState('');
 
-  console.log('vestedId', vestedId);
-  const contract = useContractLoader(
-    { ...contractLoader.contractConfig, customAddresses: { VestedERC20: vestedId } },
-    contractLoader.userSigner
-  );
+  const ethersContext = useEthersContext();
+  const vestedERC20 = useAppContracts('VestedERC20', ethersContext.chainId);
 
-  console.log('contract', contract);
+  console.log('vestedId', vestedId);
   useEffect(() => {
-    const loadAmount = () => {
-      if (contract.VestedERC20) {
-        // const value = await tx(contract.VestedERC20.getRedeemableAmount(address));
-        const value = '';
+    const loadAmount = async () => {
+      if (vestedERC20) {
+        const value = await vestedERC20.attach(vestedId).getRedeemableAmount(address);
         if (isMounted()) setRedeemableAmount(ethers.utils.formatEther(value));
       }
     };
     void loadAmount();
-  }, [address, contract.VestedERC20, isMounted, tx]);
+  }, [address, isMounted, vestedERC20, vestedId]);
 
   const handleReddem = useCallback(async () => {
-    // const result = await tx(contract.VestedERC20.redeem(address));
-    // if (result && 'wait' in result && result.wait) {
-    //   const rc = await result.wait();
-    //   if (rc && 'events' in rc && rc.events) {
-    //     const event = rc.events.find((event: any) => event.event === 'Redeem');
-    //     // event Redeem(address indexed holder, address indexed recipient, uint256 redeemedAmount);
-    //     const [_holder, _recipient, redeemedAmount] = event.args;
-    //     console.log('Redeem::redeemedAmount', ethers.utils.formatEther(redeemedAmount));
-    //   } else {
-    //     console.log('No Transfer and Redeem event emitted');
-    //   }
-    // }
-  }, [address, contract.VestedERC20, tx]);
+    if (vestedERC20) {
+      const result = await vestedERC20.attach(vestedId).redeem(address);
+      if (result?.wait) {
+        const rc = await result.wait();
+        if (rc?.events) {
+          const event = rc.events.find((event: ethers.Event) => event.event === 'Redeem');
+          if (event?.args) {
+            // event Redeem(address indexed holder, address indexed recipient, uint256 redeemedAmount);
+            const [_holder, _recipient, redeemedAmount] = event.args;
+            console.log('Redeem::redeemedAmount', ethers.utils.formatEther(redeemedAmount));
+          }
+        } else {
+          console.log('No Transfer and Redeem event emitted');
+        }
+      }
+    }
+  }, [address, vestedERC20, vestedId]);
 
   return (
     <div>

@@ -1,7 +1,9 @@
 import { Button, DateRangePicker, Field, Help, IconCross, TextInput } from '@1hive/1hive-ui';
 import dayjs from 'dayjs';
+import { useEthersContext } from 'eth-hooks/context';
 import { ethers } from 'ethers';
 import React, { useCallback, useState } from 'react';
+import { useAppContracts } from '~~/config/contractContext';
 
 import { ModalHeader, Row } from './index.styled';
 
@@ -32,7 +34,7 @@ const formatStringToBytes32 = (fromString: string) => ethers.utils.formatBytes32
 const formatStringDateToUnixstamp = (fromStringDate: string | number | Date | dayjs.Dayjs | null | undefined) =>
   dayjs(fromStringDate).unix();
 
-export const Add = ({ writeContracts, tx, closeModal }: any) => {
+export const Add = ({ closeModal }: { closeModal: any }) => {
   const [state, setState] = useState({
     tokenAddress: '',
     name: '',
@@ -43,18 +45,21 @@ export const Add = ({ writeContracts, tx, closeModal }: any) => {
     end: null,
   });
 
-  const deployVestedToken = useCallback(async () => {
-    await tx(
-      writeContracts.VestedERC20Factory.createVestedERC20(
-        formatStringToBytes32(state.name),
-        formatStringToBytes32(state.symbol),
-        18,
-        state.tokenAddress,
-        formatStringDateToUnixstamp(range.start),
-        formatStringDateToUnixstamp(range.end)
-      )
+  const ethersContext = useEthersContext();
+  const vestedERC20Factory = useAppContracts('VestedERC20Factory', ethersContext.chainId);
+
+  const deployVestedToken = useCallback(() => {
+    // await tx(
+    void vestedERC20Factory?.createVestedERC20(
+      formatStringToBytes32(state.name),
+      formatStringToBytes32(state.symbol),
+      18,
+      state.tokenAddress,
+      formatStringDateToUnixstamp(range.start),
+      formatStringDateToUnixstamp(range.end)
     );
-  }, [state, range, tx, writeContracts.VestedERC20Factory]);
+    // );
+  }, [vestedERC20Factory, state.name, state.symbol, state.tokenAddress, range.start, range.end]);
 
   return (
     <div>

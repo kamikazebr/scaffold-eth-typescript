@@ -3,27 +3,34 @@ import { Button, IconCross } from '@1hive/1hive-ui';
 import { useCallback, useState } from 'react';
 import { FieldElement } from './Add';
 import { ModalHeader, Row } from './index.styled';
-import { useContractLoader } from 'eth-hooks';
+import { useEthersContext } from 'eth-hooks/context';
+import { useAppContracts } from '~~/config/contractContext';
+import { BigNumber } from 'ethers';
+import { toDecimals } from '~~/helpers/math-utils';
 // import { toDecimals } from '../../helpers/math-utils';
 
-export const Wrap = ({ contractLoader, vestedId, tx, closeModal }: any) => {
+export const Wrap = ({ vestedId, closeModal }: { vestedId: string; closeModal: any }) => {
   const [state, setState] = useState({
     underlyingAmount: '',
     address: '',
   });
 
-  const contract = useContractLoader(
-    { ...contractLoader.contractConfig, customAddresses: { VestedERC20: vestedId } },
-    contractLoader.userSigner
-  );
+  const ethersContext = useEthersContext();
+  const vestedERC20 = useAppContracts('VestedERC20', ethersContext.chainId);
+  const testERC20 = useAppContracts('TestERC20', ethersContext.chainId);
 
   const handleWrap = useCallback(async () => {
-    // const amount = BigNumber.from(toDecimals(state.underlyingAmount, 18));
-    // allow
-    // const result = await tx(contract.TestERC20.approve(vestedId, amount));
-    // console.log('resultApprove', result);
-    // await tx(contract.VestedERC20.wrap(amount, state.address));
-  }, [tx, contract.TestERC20, contract.VestedERC20, vestedId, state.underlyingAmount, state.address]);
+    const amount = BigNumber.from(toDecimals(state.underlyingAmount, 18));
+
+    if (state.address?.trim() !== '' && amount.gt(0)) {
+      // allow
+      const result = await testERC20?.attach(vestedId).approve(vestedId, amount);
+      const status = await result?.wait();
+      console.log('resultApprove', result);
+      console.log('resultApprove->status', status);
+      await vestedERC20?.attach(vestedId).wrap(amount, state.address);
+    }
+  }, [state.address, state.underlyingAmount, testERC20, vestedERC20, vestedId]);
 
   return (
     <div>
