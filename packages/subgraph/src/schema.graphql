@@ -1,15 +1,39 @@
-type Purpose @entity {
+"""
+Factory that handle new VestedERC20 deployments
+"""
+type VestedERC20Factory @entity {
+  "ID is set to 1"
   id: ID!
-  sender: Sender!
-  purpose: String!
-  createdAt: BigInt!
-  transactionHash: String!
+  count: Int!
+  vestedERC20: [VestedERC20!]!
 }
 
-type Sender @entity {
+type VestedERC20 @entity {
   id: ID!
-  address: Bytes!
-  purposes: [Purpose!] @derivedFrom(field: "sender")
-  createdAt: BigInt!
-  purposeCount: BigInt!
+  name: String!
+  symbol: String!
+  decimals: Int!
+  underlying: ERC20!
+  startTimestamp: BigInt!
+  endTimestamp: BigInt!
+  vestings: [Vesting!]! @derivedFrom(field: "token")
+}
+
+type Vesting @entity {
+  "Concatenation of token ID, and recipient"
+  id: ID!
+  "Creation timestamp"
+  createdAt: Int!
+  token: VestedERC20!
+  recipient: Bytes!
+  underlyingAmount: BigInt!
+  claimedUnderlyingAmount: BigInt!
+  wrappedTokenAmount: BigInt!
+}
+
+type ERC20 @entity {
+  id: ID!
+  name: String!
+  symbol: String!
+  decimals: Int!
 }

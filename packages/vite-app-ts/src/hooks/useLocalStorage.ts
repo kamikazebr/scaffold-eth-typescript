@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { useState } from 'react';
 // Hook from useHooks! (https://usehooks.com/useLocalStorage/)
 

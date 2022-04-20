@@ -66,7 +66,7 @@ export const getWeb3ModalConfig = async (): Promise<Partial<ICoreOptions>> => {
       package: walletLinkProvider,
       connector: async (provider: any, _options: any): Promise<any> => {
         await provider.enable();
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
         return provider;
       },
     };

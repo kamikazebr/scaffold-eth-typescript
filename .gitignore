@@ -16,7 +16,9 @@ tenderly.yaml
 .yalc
 yalc.lock
 packages/vite-app-ts/dist
+packages/vite-app-ts/public/aragon-ui/*
 packages/hardhat-ts/mnemonic.secret
+packages/**/data
 
 # ts
 packages/hardhat-ts/cache

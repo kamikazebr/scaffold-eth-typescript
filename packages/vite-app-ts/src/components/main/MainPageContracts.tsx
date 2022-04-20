@@ -4,7 +4,6 @@ import React, { FC } from 'react';
 
 import { IScaffoldAppProviders } from '~~/components/main/hooks/useScaffoldAppProviders';
 import { useAppContracts } from '~~/config/contractContext';
-import { NETWORKS } from '~~/models/constants/networks';
 export interface IMainPageContractsProps {
   scaffoldAppProviders: IScaffoldAppProviders;
 }
@@ -18,8 +17,8 @@ export interface IMainPageContractsProps {
  */
 export const MainPageContracts: FC<IMainPageContractsProps> = (props) => {
   const ethersContext = useEthersContext();
-  const mainnetDai = useAppContracts('DAI', NETWORKS.mainnet.chainId);
-  const yourContract = useAppContracts('YourContract', ethersContext.chainId);
+  // const mainnetDai = useAppContracts('DAI', NETWORKS.mainnet.chainId);
+  const testERC20 = useAppContracts('TestERC20', ethersContext.chainId);
 
   if (ethersContext.account == null) {
     return <></>;
@@ -34,8 +33,8 @@ export const MainPageContracts: FC<IMainPageContractsProps> = (props) => {
           and give you a form to interact with it locally
         ********** */}
         <GenericContract
-          contractName="YourContract"
-          contract={yourContract}
+          contractName="TestERC20"
+          contract={testERC20}
           mainnetAdaptor={props.scaffoldAppProviders.mainnetAdaptor}
           blockExplorer={props.scaffoldAppProviders.targetNetwork.blockExplorer}
         />
