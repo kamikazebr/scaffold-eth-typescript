@@ -4,10 +4,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "cross-env ENVIRONMENT=DEVELOPMENT vite --force",
+    "start": "yarn sync-assets && cross-env ENVIRONMENT=DEVELOPMENT vite --force",
     "check": "yarn tsc --noEmit",
     "contracts:external": "yarn shx rm -rf './src/generated/external-contracts' && yarn shx cp -r './scripts/eth-sdk-config.ts.bak' './src/generated/eth-sdk.config.ts' && yarn eth-sdk -p ./src/generated",
-    "build": "tsc && yarn build:anttheme && cross-env ENVIRONMENT=PRODUCTION vite build",
+    "build": "yarn sync-assets && tsc && yarn build:anttheme && cross-env ENVIRONMENT=PRODUCTION vite build",
     "build:anttheme": "yarn lessc -x -js ./src/styles/themes/light-theme.less ./public/light-theme.css && yarn lessc -x -js ./src/styles/themes/dark-theme.less ./public/dark-theme.css",
     "serve": "vite preview --host",
     "lint": "eslint --config ./.eslintrc --ignore-path ./.eslintignore ./src/**/*.(ts|tsx)",
@@ -19,7 +19,8 @@
     "ship": "yarn surge",
     "dev:link:components": "yalc link eth-components",
     "dev:link:hooks": "yalc link eth-hooks",
-    "dev:unlink": "yalc remove eth-hooks && yalc remove eth-components"
+    "dev:unlink": "yalc remove eth-hooks && yalc remove eth-components",
+    "sync-assets": "copy-aragon-ui-assets ./public"
   },
   "dependencies": {
     "@1hive/1hive-ui": "^1.0.18",
