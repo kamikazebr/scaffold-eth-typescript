@@ -1,23 +1,20 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import '~~/styles/main-page.css';
 
-import { GenericContract } from 'eth-components/ant/generic-contract';
-import { useContractReader, useBalance, useEthersAdaptorFromProviderOrSigners, useEventListener } from 'eth-hooks';
+import { useContractReader, useBalance, useEthersAdaptorFromProviderOrSigners } from 'eth-hooks';
 import { useEthersContext } from 'eth-hooks/context';
 import { useDexEthPrice } from 'eth-hooks/dapps';
 import { asEthersAdaptor } from 'eth-hooks/functions';
 
 import { MainPageMenu, MainPageContracts, MainPageFooter, MainPageHeader } from './components/main';
-import { useScaffoldHooksExamples as useScaffoldHooksExamples } from './components/main/hooks/useScaffoldHooksExamples';
 
 import { useBurnerFallback } from '~~/components/main/hooks/useBurnerFallback';
 import { useScaffoldProviders as useScaffoldAppProviders } from '~~/components/main/hooks/useScaffoldAppProviders';
-import { Hints, ExampleUI } from '~~/components/pages';
 import { BURNER_FALLBACK_ENABLED, MAINNET_PROVIDER } from '~~/config/appConfig';
 import { useAppContracts, useConnectAppContracts, useLoadAppContracts } from '~~/config/contractContext';
-import { NETWORKS } from '~~/models/constants/networks';
+import { Subgraph } from './components/pages';
 
 /**
  * ⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️⛳️
@@ -64,26 +61,28 @@ export const Main: FC = () => {
   // 🎉 Console logs & More hook examples:
   // 🚦 disable this hook to stop console logs
   // 🏹🏹🏹 go here to see how to use hooks!
-  useScaffoldHooksExamples(scaffoldAppProviders);
+  // useScaffoldHooksExamples(scaffoldAppProviders);
 
   // -----------------------------
   // These are the contracts!
   // -----------------------------
 
   // init contracts
-  const yourContract = useAppContracts('YourContract', ethersContext.chainId);
-  const mainnetDai = useAppContracts('DAI', NETWORKS.mainnet.chainId);
+  const vestedERC20Factory = useAppContracts('VestedERC20Factory', ethersContext.chainId);
+  const vestedERC20 = useAppContracts('VestedERC20', ethersContext.chainId);
+  // const mainnetDai = useAppContracts('DAI', NETWORKS.mainnet.chainId);
 
   // keep track of a variable from the contract in the local React state:
-  const [purpose, update] = useContractReader(
-    yourContract,
-    yourContract?.purpose,
-    [],
-    yourContract?.filters.SetPurpose()
+  const [redeemableAmount, update] = useContractReader(
+    vestedERC20,
+    vestedERC20?.getRedeemableAmount,
+    ['0xHolderAdress'],
+    vestedERC20?.filters.Transfer()
   );
 
   // 📟 Listen for broadcast events
-  const [setPurposeEvents] = useEventListener(yourContract, 'SetPurpose', 0);
+  // const [setPurposeEvents] = useEventListener(yourContract, 'SetPurpose', 0);
+  // const [listRedeemEvents] = useEventListener(vestedERC20, 'Redeem', 0);
 
   // -----------------------------
   // .... 🎇 End of examples
@@ -111,22 +110,14 @@ export const Main: FC = () => {
             <MainPageContracts scaffoldAppProviders={scaffoldAppProviders} />
           </Route>
           {/* you can add routes here like the below examlples */}
-          <Route path="/hints">
-            <Hints
-              address={ethersContext?.account ?? ''}
-              yourCurrentBalance={yourCurrentBalance}
-              mainnetProvider={scaffoldAppProviders.mainnetAdaptor?.provider}
-              price={ethPrice}
-            />
-          </Route>
-          <Route path="/exampleui">
-            <ExampleUI
+          {/* <Route path="/exampleui"> */}
+          {/* <ExampleUI
               mainnetProvider={scaffoldAppProviders.mainnetAdaptor?.provider}
               yourCurrentBalance={yourCurrentBalance}
               price={ethPrice}
-            />
-          </Route>
-          <Route path="/mainnetdai">
+            /> */}
+          {/* </Route> */}
+          {/* <Route path="/mainnetdai">
             {MAINNET_PROVIDER != null && (
               <GenericContract
                 contractName="DAI"
@@ -135,13 +126,15 @@ export const Main: FC = () => {
                 blockExplorer={NETWORKS.mainnet.blockExplorer}
               />
             )}
-          </Route>
+          </Route> */}
           {/* Subgraph also disabled in MainPageMenu, it does not work, see github issue! */}
-          {/*
+
           <Route path="/subgraph">
-            <Subgraph subgraphUri={subgraphUri} mainnetProvider={scaffoldAppProviders.mainnetAdaptor?.provider} />
+            <Subgraph
+              subgraphUri={'http://localhost:8000/subgraphs/name/scaffold-eth/your-contract'}
+              mainnetProvider={scaffoldAppProviders.mainnetAdaptor?.provider}
+            />
           </Route>
-          */}
         </Switch>
       </BrowserRouter>
 

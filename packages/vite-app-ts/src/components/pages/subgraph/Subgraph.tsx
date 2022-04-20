@@ -1,18 +1,23 @@
 import { Button, Input, Table, Typography } from 'antd';
 
-// import 'graphiql/graphiql.min.css';
-
 import { Address } from 'eth-components/ant';
-import { transactor } from 'eth-components/functions';
+// import { transactor } from 'eth-components/functions';
 import { EthComponentsSettingsContext } from 'eth-components/models';
-import { useGasPrice } from 'eth-hooks';
+// import { useGasPrice } from 'eth-hooks';
 import { useEthersContext } from 'eth-hooks/context';
 import { TEthersProvider } from 'eth-hooks/models';
-// import GraphiQL from 'graphiql';
+import 'antd/dist/antd.css';
+import GraphiQL from 'graphiql';
+import 'graphiql/graphiql.min.css';
 import React, { FC, ReactElement, useContext, useState } from 'react';
-import { useQuery } from 'react-query';
 
-import { useAppContracts } from '~~/config/contractContext';
+// // import { useAppContracts } from '~~/config/contractContext';
+
+// import { useQuery, useQueryClient, QueryClient, QueryClientProvider } from 'react-query';
+// import { ReactQueryDevtools } from 'react-query/devtools';
+// import { request, gql } from 'graphql-request';
+import { useVestingsQuery, VestingsQuery } from '~~/types-and-hooks';
+import { SUBGRAPH_URI } from '~~/config/appConfig';
 
 // const GraphiQL = lazy(() => import('graphiql'));
 
@@ -41,42 +46,40 @@ export const Subgraph: FC<ISubgraphProps> = (props) => {
   };
 
   const ethersContext = useEthersContext();
-  const [gasPrice] = useGasPrice(ethersContext.chainId, 'fast');
-  const tx = transactor(ethComponentsSettings, ethersContext?.signer, gasPrice);
-  const yourContract = useAppContracts('YourContract', ethersContext.chainId);
-
+  // const [gasPrice] = useGasPrice(ethersContext.chainId, 'fast');
+  // const tx = transactor(ethComponentsSettings, ethersContext?.signer, gasPrice);
+  // const testERC20 = useAppContracts('TestERC20', ethersContext.chainId);
+  const { data, isFetching, error } = useVestingsQuery<VestingsQuery, unknown>({ endpoint: SUBGRAPH_URI });
   const EXAMPLE_GQL = `
-    {
-      purposes(first: 25, orderBy: createdAt, orderDirection: desc) {
-        id
-        purpose
-        createdAt
-        sender {
-          id
-        }
-      }
-      senders {
-        id
-        address
-        purposeCount
-      }
+  {
+    erc20S {
+      id
+      symbol
+      name
     }
+  }
   `;
-  const { isLoading, data } = useQuery(EXAMPLE_GQL, {});
-  const graphqlData = data as any;
+
+  // const { isLoading, data, error } = useQuery(EXAMPLE_GQL, {});
+
+  // const graphqlData = data as any;
+  console.log(isFetching);
+  console.log(data);
+  console.log(error);
 
   const purposeColumns = [
     {
-      title: 'Purpose',
-      dataIndex: 'purpose',
-      key: 'purpose',
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
-      title: 'Sender',
+      title: 'Address',
       key: 'id',
-      render: (record: any): ReactElement => (
-        <Address address={record.sender.id} ensProvider={props.mainnetProvider} fontSize={16} />
-      ),
+      render: (record: any): ReactElement => {
+        console.log('record', record);
+        return <Address address={record.id} ensProvider={props.mainnetProvider} fontSize={16} />;
+      },
     },
     {
       title: 'createdAt',
@@ -185,20 +188,20 @@ export const Subgraph: FC<ISubgraphProps> = (props) => {
             onClick={(): void => {
               console.log('newPurpose', newPurpose);
               /* look how you call setPurpose on your contract: */
-              void tx?.(yourContract?.setPurpose(newPurpose));
+              // void tx?.(yourContract?.setPurpose(newPurpose));
             }}>
             Set Purpose
           </Button>
         </div>
 
-        {graphqlData?.purposes ? (
-          <Table dataSource={graphqlData.purposes} columns={purposeColumns} rowKey="id" />
+        {data?.vestings ? (
+          <Table dataSource={data?.vestings} columns={purposeColumns} rowKey="id" />
         ) : (
-          <Typography>{isLoading ? 'Loading...' : deployWarning}</Typography>
+          <Typography>{isFetching ? 'Loading...' : deployWarning}</Typography>
         )}
 
         <div style={{ margin: 32, height: 400, border: '1px solid #888888', textAlign: 'left' }}>
-          {/* <GraphiQL fetcher={graphQLFetcher} docExplorerOpen query={EXAMPLE_GQL} /> */}
+          <GraphiQL fetcher={graphQLFetcher} docExplorerOpen query={EXAMPLE_GQL} />
         </div>
       </div>
 
