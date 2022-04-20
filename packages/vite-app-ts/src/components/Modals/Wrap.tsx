@@ -21,15 +21,9 @@ export const Wrap = ({ vestedId, closeModal }: { vestedId: string; closeModal: a
 
   const handleWrap = useCallback(async () => {
     const amount = BigNumber.from(toDecimals(state.underlyingAmount, 18));
-
-    if (state.address?.trim() !== '' && amount.gt(0)) {
-      // allow
-      const result = await testERC20?.attach(vestedId).approve(vestedId, amount);
-      const status = await result?.wait();
-      console.log('resultApprove', result);
-      console.log('resultApprove->status', status);
-      await vestedERC20?.attach(vestedId).wrap(amount, state.address);
-    }
+    console.log('vestedId', vestedId);
+    await testERC20?.attach(vestedId).approve(vestedId, amount);
+    await vestedERC20?.attach(vestedId).wrap(amount, state.address);
   }, [state.address, state.underlyingAmount, testERC20, vestedERC20, vestedId]);
 
   return (

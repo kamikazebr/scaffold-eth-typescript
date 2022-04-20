@@ -16,8 +16,6 @@ const VestedList = ({ handleWrapVesting }: { handleWrapVesting: any }) => {
 
   // const data = mockData;
 
-  console.log(`data`, data, error);
-
   return data?.vestedERC20S.length > 0 ? (
     <Wrapper>
       {data.vestedERC20S.map((vestedERC20: any, index: any) => {

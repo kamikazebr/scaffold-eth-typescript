@@ -12,7 +12,7 @@ import { MainPageMenu, MainPageFooter, MainPageHeader } from './components/main'
 
 import { useBurnerFallback } from '~~/components/main/hooks/useBurnerFallback';
 import { useScaffoldProviders as useScaffoldAppProviders } from '~~/components/main/hooks/useScaffoldAppProviders';
-import { BURNER_FALLBACK_ENABLED } from '~~/config/appConfig';
+import { BURNER_FALLBACK_ENABLED, SUBGRAPH_URI } from '~~/config/appConfig';
 import { useAppContracts, useConnectAppContracts, useLoadAppContracts } from '~~/config/contractContext';
 import { Subgraph } from './components/pages';
 import Home from './components/pages/home/Home';
@@ -131,10 +131,7 @@ export const Main: FC = () => {
           {/* Subgraph also disabled in MainPageMenu, it does not work, see github issue! */}
 
           <Route path="/subgraph">
-            <Subgraph
-              subgraphUri={'http://localhost:8000/subgraphs/name/scaffold-eth/your-contract'}
-              mainnetProvider={scaffoldAppProviders.mainnetAdaptor?.provider}
-            />
+            <Subgraph subgraphUri={SUBGRAPH_URI} mainnetProvider={scaffoldAppProviders.mainnetAdaptor?.provider} />
           </Route>
         </Switch>
       </BrowserRouter>
